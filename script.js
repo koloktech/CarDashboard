@@ -21,7 +21,7 @@ function submitData() {
     document.getElementById("loadingOverlay").style.display = "flex";
 
     // --- CONFIGURATION ---
-    const SCRIPT_URL = "YOUR_WEB_APP_URL_HERE"; // <--- PASTE YOUR GOOGLE SCRIPT URL HERE
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1JIcQKAFEtQWp4Png1Tyn--Jusjd4r-8PdcLg8BK8q6hXvGe2hqCGaOkop2ukWnPY2A/exec"; // <--- PASTE YOUR GOOGLE SCRIPT URL HERE
     
     // We append the current page URL as a query param so the backend can verify it
     const currentOrigin = window.location.href; 
