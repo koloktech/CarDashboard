@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NFS Fuel Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  font-family: 'Orbitron', Arial, sans-serif;
+  background: radial-gradient(circle at top,#111,#000);
+  color: #fff;
+  margin: 0;
+  padding: 20px;
+}
+header {
+  text-align: center;
+  border-bottom: 2px solid #ff2e2e;
+  padding-bottom: 10px;
+}
+.kpi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
+  gap: 16px;
+  margin: 30px 0;
+}
+
+.kpi div {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,46,46,0.6);
+  padding: 18px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(255,46,46,0.15);
+}
+
+.kpi h2 {
+  margin: 0;
+  font-size: 1.6em;
+  color: #ff3b3b;
+}
+
+.kpi span {
+  font-size: 0.85em;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+
+</style>
+</head>
+
+<body>
+<header>
+  <h1>HONDA CITY i-DSI</h1>
+  <p>Fuel Performance Dashboard</p>
+</header>
+
+<section class="kpi">
+  <div>
+    <h2 id="avgKml">--</h2>
+    <span>Avg km/L</span>
+  </div>
+  <div>
+    <h2 id="bestKml">--</h2>
+    <span>Best km/L</span>
+  </div>
+  <div>
+    <h2 id="totalRM">RM --</h2>
+    <span>Total Fuel Spend</span>
+  </div>
+  <div>
+    <h2 id="totalKM">-- km</h2>
+    <span>Total Distance</span>
+  </div>
+</section>
+
+<p id="lastUpdated" style="text-align:center;opacity:0.7"></p>
+
+
+<canvas id="fuelChart" height="120"></canvas>
+
+<a href="add.html" class="btn">➕ ADD FUEL ENTRY</a>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycby1JIcQKAFEtQWp4Png1Tyn--Jusjd4r-8PdcLg8BK8q6hXvGe2hqCGaOkop2ukWnPY2A/exec";
+
+fetch(API_URL)
+  .then(r => r.json())
+  .then(data => {
+    const valid = data.filter(d => d["Distance (km)"]);
+
+const kmL = data
+  .map(d => Number(d["km_per_L"]))
+  .filter(v => !isNaN(v));
+
+const totalRM = data
+  .map(d => Number(d["Amount (RM)"]))
+  .filter(v => !isNaN(v))
+  .reduce((a,b)=>a+b,0);
+
+const totalKM = data
+  .map(d => Number(d["Distance (km)"]))
+  .filter(v => !isNaN(v))
+  .reduce((a,b)=>a+b,0);
+
+document.getElementById("avgKml").innerText =
+  (kmL.reduce((a,b)=>a+b,0)/kmL.length).toFixed(2);
+
+document.getElementById("bestKml").innerText =
+  Math.max(...kmL).toFixed(2);
+
+document.getElementById("totalRM").innerText =
+  "RM " + totalRM.toFixed(2);
+
+document.getElementById("totalKM").innerText =
+  totalKM.toFixed(1) + " km";
+
+document.getElementById("lastUpdated").innerText =
+  "Last updated: " + new Date().toLocaleString();
+
+new Chart(document.getElementById("fuelChart"), {
+  type: "line",
+  data: {
+    labels: data.map(d => d.Date),
+    datasets: [{
+      label: "Fuel Efficiency (km/L)",
+      data: kmL,
+      borderColor: "#ff2e2e",
+      tension: 0.35,
+      fill: false
+    }]
+  },
+  options: {
+    plugins:{legend:{labels:{color:"#fff"}}},
+    scales:{
+      x:{ticks:{color:"#aaa"}},
+      y:{ticks:{color:"#aaa"}}
+    }
+  }
+});
+
+  });
+</script>
+</body>
+</html>
